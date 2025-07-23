@@ -1,0 +1,194 @@
+[
+    {
+        "Name": "Alpha",
+        "HP": 20,
+        "SP": 3,
+        "weapons": [
+            [
+                "M SMG",
+                "2d6"
+            ],
+            [
+                "M Pistol",
+                "2d6"
+            ],
+            [
+                "M Melee",
+                "2d6"
+            ],
+            [
+                "Rippers",
+                "2d6"
+            ],
+            [
+                "Baseball bats/pipes",
+                "2d6"
+            ],
+            [
+                "machetes",
+                "2d6"
+            ]
+        ],
+        "challenge_score": null,
+        "attributes": {
+            "I": 2,
+            "R": 6,
+            "D": 5,
+            "T": 2,
+            "C": 4,
+            "W": 2,
+            "M": 4,
+            "B": 4,
+            "E": 3
+        },
+        "melee_skills": {
+            "B": 9,
+            "E": 7,
+            "MA": 0,
+            "M": 11
+        },
+        "ranged_skills": {
+            "A": 6,
+            "Ha": 10,
+            "He": 0,
+            "S": 8
+        }
+    },
+    {
+        "Name": "Bravo",
+        "HP": 30,
+        "SP": 7,
+        "weapons": [
+            [
+                "Assault Rifle",
+                "5d6"
+            ],
+            [
+                "Heavy Pistol",
+                "3d6"
+            ],
+            [
+                "Big knucks",
+                "3d6"
+            ]
+        ],
+        "challenge_score": null,
+        "attributes": {
+            "I": 4,
+            "R": 7,
+            "D": 5,
+            "T": 4,
+            "C": 5,
+            "W": 2,
+            "M": 5,
+            "B": 4,
+            "E": 3
+        },
+        "melee_skills": {
+            "B": 9,
+            "E": 7,
+            "MA": 0,
+            "M": 11
+        },
+        "ranged_skills": {
+            "A": 10,
+            "Ha": 12,
+            "He": 3,
+            "S": 12
+        }
+    },
+    {
+        "Name": "Charlie",
+        "HP": 35,
+        "SP": 7,
+        "weapons": [
+            [
+                "Vampyres",
+                "1d6"
+            ],
+            [
+                "rippers",
+                "2d6"
+            ],
+            [
+                "Heavy Pistol",
+                "3d6"
+            ]
+        ],
+        "challenge_score": null,
+        "attributes": {
+            "I": 5,
+            "R": 8,
+            "D": 6,
+            "T": 4,
+            "C": 5,
+            "W": 5,
+            "M": 7,
+            "B": 5,
+            "E": 2
+        },
+        "melee_skills": {
+            "B": 8,
+            "E": 14,
+            "MA": 0,
+            "M": 13
+        },
+        "ranged_skills": {
+            "A": 8,
+            "Ha": 8,
+            "He": 3,
+            "S": 8
+        }
+    },
+    {
+        "Name": "Delta",
+        "HP": 35,
+        "SP": 11,
+        "weapons": [
+            [
+                "Vampyres",
+                "1d6"
+            ],
+            [
+                "wolvers/integrated blades",
+                "3d6"
+            ],
+            [
+                "Heavy Pistol",
+                "3d6"
+            ],
+            [
+                "assault rifle",
+                "5d6"
+            ],
+            [
+                "sniper rifles",
+                "5d6"
+            ]
+        ],
+        "challenge_score": null,
+        "attributes": {
+            "I": 6,
+            "R": 8,
+            "D": 7,
+            "T": 4,
+            "C": 5,
+            "W": 5,
+            "M": 7,
+            "B": 5,
+            "E": 2
+        },
+        "melee_skills": {
+            "B": 8,
+            "E": 14,
+            "MA": 0,
+            "M": 13
+        },
+        "ranged_skills": {
+            "A": 10,
+            "Ha": 15,
+            "He": 3,
+            "S": 15
+        }
+    }
+]
