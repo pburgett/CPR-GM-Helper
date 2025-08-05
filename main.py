@@ -125,7 +125,6 @@ class cmdprompt(Cmd):
 
     def set_init(self, cmds):
         # TODO - implement stronger error handling to prevent total crashout 
-        print(cmds)
         if len(cmds) > 3:
             print("Error - unrecognized command structure.")
         elif cmds[1] not in self.charKeys:
@@ -152,8 +151,6 @@ class cmdprompt(Cmd):
                 "Please set all character's initiatives to get a proper reading.")
             print(self.initiativeQueue)
         else:
-            # forcing correct order of charKeys
-             # charKeys = list(self.initiativeQueue.keys())
             i = 0
             print("==================================")
             print(" Char, Init, HP, SP, Weapons")
@@ -186,26 +183,21 @@ class cmdprompt(Cmd):
         target_obj = self.initiativeQueue[cmds[1]][0]
         attack = int(cmds[2])
         defense = int(cmds[3])
-        print(attack > defense)
         return True if attack > defense else False
 
 
     def deal_damage(self, cmds):
         target, dmg_type, dmg = cmds[1], cmds[2], int(cmds[3])
-        #is_ranged = True if cmds[2] == 'ranged' else False
         self.initiativeQueue[target][0].damage(dmg, dmg_type)
         return 
 
     def default(self, inp):
         cmds = inp.split(' ')
-        print(cmds)
-        #print(initiativeQueue)
         if cmds[0] == "display":
             self.table_show()
         if cmds[0] == "init":
             self.initiativeQueue = self.set_init(cmds)
             if self.combatReady:
-                # charKeys = list(self.initiativeQueue.keys())
                 self.table_show()
 
         if cmds[0] == "attack":
@@ -213,8 +205,6 @@ class cmdprompt(Cmd):
                 print("Error - not all initiatives have been set!"
                     "Give all characters an initiative value before proceeding.")
             else:
-                # charKeys = list(self.initiativeQueue.keys())
-                #print(cmds, charKeys[self.turn])
                 if cmds[1] not in self.charKeys:
                     print("Error - target", cmds[0], " not found")
                 elif cmds[1] == self.charKeys[self.turn]:
@@ -227,7 +217,6 @@ class cmdprompt(Cmd):
                         print("The attack did not hit.")
 
         if cmds[0] == "damage":
-            # charKeys = list(self.initiativeQueue.keys())
             if cmds[1] == self.charKeys[self.turn]:
                 print("Error - this command would apply self-inflicted damage.")
             else:
@@ -240,12 +229,6 @@ class cmdprompt(Cmd):
 
         if inp == 'x' or inp == 'q':
             return self.do_exit(inp)
-
-
-
-
-
-
 
 if __name__ == '__main__':  
     cmdprompt().cmdloop()
