@@ -191,6 +191,14 @@ class cmdprompt(Cmd):
         self.initiativeQueue[target][0].damage(dmg, dmg_type)
         return 
 
+    def heal(self, cmds):
+        target, value = cmds[1], int(cmds[2])
+        self.initiativeQueue[target][0].heal(value)
+
+    def armor_recover(self, cmds):
+        target, value = cmds[1], int(cmds[2])
+        self.initiativeQueue[target][0].armor_recover(value)
+
     def default(self, inp):
         cmds = inp.split(' ')
         if cmds[0] == "display":
@@ -223,6 +231,18 @@ class cmdprompt(Cmd):
                 self.deal_damage(cmds)
                 print(cmds[3], "points of damage applied to ", cmds[1], "\n",
                     "Current HP is ", self.initiativeQueue[cmds[1]][0].hp)
+
+        if cmds[0] == "heal":
+            if cmds[1] not in self.charKeys:
+                print("Error - target", cmds[0], " not found")
+            else:
+                self.heal(cmds)
+        
+        if cmds[0] == "armor_recover":
+            if cmds[1] not in self.charKeys:
+                print("Error - target", cmds[0], " not found")
+            else:
+                self.armor_recover(cmds)
 
         if cmds[0] == "pass":
             self.turn_pass()
