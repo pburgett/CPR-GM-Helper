@@ -6,6 +6,19 @@ import random
 import json
 import math
 
+rangedWeaponDVs = {
+    "Weapon Type/Range": ["0-6M", "7-12M", "13-25M", "26-50M", "51-100M", "101-200M", "201-400M", "400-800M"],
+    "Pistol": [13, 15, 20, 25, 30, 30, "N/A", "N/A"],
+    "SMG": [15, 13, 15, 20, 25, 25, 30, "N/A"],
+    "SMG Autofire": [15, 13, 15, 20, 25, "N/A", "N/A"],
+    "Shotgun (Slug)": [13, 15, 20, 25, 30, 35, "N/A", "N/A"],
+    "Assault Rifle": [17, 16, 15, 13, 15, 20, 25, 30],
+    "Sniper Rifle": [30, 25, 25, 20, 15, 16, 17, 20],
+    "Bow/Crossbow": [15, 13, 15, 17, 20, 22, "N/A", "N/A"],
+    "Grenade Launcher": [16, 15, 15, 17, 20, 22, 25, "N/A"],
+    "Rocket Launcher": [17, 16, 15, 15, 20, 20, 25, 30]
+}
+
 def ingest(sheet):
     chars = {}
     with open(str(sheet), "r") as file:
@@ -199,6 +212,22 @@ class cmdprompt(Cmd):
         target, value = cmds[1], int(cmds[2])
         self.initiativeQueue[target][0].armor_recover(value)
 
+    def range_table(self, cmds):
+        if len(cmds) > 1:
+            searchKey = " ".join(cmds[1:])
+            if searchKey in rangedWeaponDVs.keys():
+                print(rangedWeaponDVs["Weapon Type/Range"])
+                print(rangedWeaponDVs[searchKey])
+            else:
+                print("Warning - ", searchKey, " not found in ranged weapons DV table")
+                print("Printing out ranged weapons DV table in full")
+                for k,v in rangedWeaponDVs.items():
+                    print(k,v)
+
+        else:
+            for k,v in rangedWeaponDVs.items():
+                print(k,v)
+
     def default(self, inp):
         cmds = inp.split(' ')
         if cmds[0] == "display":
@@ -243,6 +272,8 @@ class cmdprompt(Cmd):
                 print("Error - target", cmds[0], " not found")
             else:
                 self.armor_recover(cmds)
+        if cmds[0] == "range_table":
+            self.range_table(cmds)
 
         if cmds[0] == "pass":
             self.turn_pass()
