@@ -11,13 +11,14 @@ rangedWeaponDVs = {
     "Pistol": [13, 15, 20, 25, 30, 30, "N/A", "N/A"],
     "SMG": [15, 13, 15, 20, 25, 25, 30, "N/A"],
     "SMG Autofire": [15, 13, 15, 20, 25, "N/A", "N/A"],
-    "Shotgun (Slug)": [13, 15, 20, 25, 30, 35, "N/A", "N/A"],
+    "Shotgun": [13, 15, 20, 25, 30, 35, "N/A", "N/A"],
     "Assault Rifle": [17, 16, 15, 13, 15, 20, 25, 30],
     "Sniper Rifle": [30, 25, 25, 20, 15, 16, 17, 20],
     "Bow/Crossbow": [15, 13, 15, 17, 20, 22, "N/A", "N/A"],
     "Grenade Launcher": [16, 15, 15, 17, 20, 22, 25, "N/A"],
     "Rocket Launcher": [17, 16, 15, 15, 20, 20, 25, 30]
 }
+rangedDVCeilings = [6, 12, 25, 50, 100, 200, 400, 800]
 
 def ingest(sheet):
     chars = {}
@@ -38,6 +39,8 @@ def ingest(sheet):
             newEntity.attributes = row["attributes"]
             newEntity.melee_skills = row["melee_skills"]
             newEntity.ranged_skills = row["ranged_skills"]
+            if "notes" in row:
+                newEntity.notes = row["notes"]
             chars[row["Name"]] = newEntity 
     return chars
 
@@ -129,10 +132,10 @@ class cmdprompt(Cmd):
     charKeysLen = len(charKeys)
     initiativeQueue = {}
     combatReady = False
-    commandHistory = []
+    lastCommand = ''
     turn = 0
 
-    def do_exit(self, inp):
+    def save_and_exit(self, inp):
         print("Bye")
         return True
 
@@ -191,13 +194,37 @@ class cmdprompt(Cmd):
     
     def eval_hit(self, subject, cmds):
         # expected structure - attack <target> <attacker roll> <defender roll>
+        # OR - attack <target> <attacker roll> <range> <weapon type>
         target_obj = self.initiativeQueue[cmds[1]][0]
         subject_obj = self.initiativeQueue[subject][0]
-        target_obj = self.initiativeQueue[cmds[1]][0]
         attack = int(cmds[2])
-        defense = int(cmds[3])
-        return True if attack > defense else False
-
+        secondaryInputs = cmds[3:]
+        if len(secondaryInputs) == 1 and secondaryInputs[0].isdigit():
+            # in the event where defender rolls
+            # ie melee, brawling, or bullet dodge
+            return True if attack > int(secondaryInputs[0]) else False 
+        else:
+            # in the event of a ranged attack with set DV
+            attack_range = int(secondaryInputs[0].replace("m", "").replace("M", ""))
+            weapon_type = " ".join(secondaryInputs[1:])
+            try:
+                weapon_dv_row = rangedWeaponDVs[weapon_type]
+            except KeyError as e:
+                print("Invalid weapon type.")
+                print("Please validate your weapon type and try again.")
+            dv_index = 7
+            i = 0
+            while (i < dv_index):
+                if attack_range <= rangedDVCeilings[i]:
+                    dv_index = i
+                    break
+                i += 1
+            difficulty_value = rangedWeaponDVs[weapon_type][dv_index]
+            print(f'Ranged attack DV is - {difficulty_value}')
+            if difficulty_value == "N/A":
+                # The shot is impossible, therefore we can set an impossible DV
+                difficulty_value = 999
+            return True if attack > difficulty_value else False
 
     def deal_damage(self, cmds):
         target, dmg_type, dmg = cmds[1], cmds[2], int(cmds[3])
@@ -211,7 +238,16 @@ class cmdprompt(Cmd):
     def armor_recover(self, cmds):
         target, value = cmds[1], int(cmds[2])
         self.initiativeQueue[target][0].armor_recover(value)
+    
+    def direct_armor_damage(self, cmds):
+        target, value = cmds[1], int(cmds[2])
+        if self.initiativeQueue[target][0].sp - value > 0:
+            self.initiativeQueue[target][0].sp -= value 
+        else:
+            self.initiativeQueue[target][0].sp = 0 
 
+
+        
     def range_table(self, cmds):
         if len(cmds) > 1:
             searchKey = " ".join(cmds[1:])
@@ -230,56 +266,72 @@ class cmdprompt(Cmd):
 
     def default(self, inp):
         cmds = inp.split(' ')
+        print(inp)
         if cmds[0] == "display":
             self.table_show()
         if cmds[0] == "init":
             self.initiativeQueue = self.set_init(cmds)
             if self.combatReady:
                 self.table_show()
-
-        if cmds[0] == "attack":
-            if not self.combatReady:
-                print("Error - not all initiatives have been set!"
-                    "Give all characters an initiative value before proceeding.")
-            else:
-                if cmds[1] not in self.charKeys:
-                    print("Error - target", cmds[0], " not found")
-                elif cmds[1] == self.charKeys[self.turn]:
-                    print("Error - this command would be a self-inflicted damage roll.")
+        try:
+            if cmds[0] == "attack":
+                if not self.combatReady:
+                    print("Error - not all initiatives have been set!"
+                        "Give all characters an initiative value before proceeding.")
                 else:
-                    if self.eval_hit(self.charKeys[self.turn], cmds):
-                        print("The attack hits! Roll the appropriate count of D6s and run\n",
-                            "damage ", cmds[1], " <type [ranged/melee/autofire/direct] <damage>")
+                    if cmds[1] not in self.charKeys:
+                        print("Error - target", cmds[1], " not found")
+                    elif cmds[1] == self.charKeys[self.turn]:
+                        print("Error - this command would be a self-inflicted damage roll.")
                     else:
-                        print("The attack did not hit.")
+                        if self.eval_hit(self.charKeys[self.turn], cmds):
+                            print(f"The attack hits! Roll the appropriate count of D6s and run\n",
+                                "damage {cmds[1]} <type [ranged/melee/autofire/direct] <damage>")
+                        else:
+                            print("The attack did not hit.")
 
-        if cmds[0] == "damage":
-            if cmds[1] == self.charKeys[self.turn]:
-                print("Error - this command would apply self-inflicted damage.")
-            else:
-                self.deal_damage(cmds)
-                print(cmds[3], "points of damage applied to ", cmds[1], "\n",
-                    "Current HP is ", self.initiativeQueue[cmds[1]][0].hp)
+            if cmds[0] == "damage":
+                if cmds[1] == self.charKeys[self.turn]:
+                    print("Error - this command would apply self-inflicted damage.")
+                else:
+                    self.deal_damage(cmds)
+                    print(f"{cmds[3]} points of damage applied to {cmds[1]} \n",
+                        "Current HP is { self.initiativeQueue[cmds[1]][0].hp}")
 
-        if cmds[0] == "heal":
-            if cmds[1] not in self.charKeys:
-                print("Error - target", cmds[0], " not found")
-            else:
-                self.heal(cmds)
+            if cmds[0] == "heal":
+                if cmds[1] not in self.charKeys:
+                    print(f"Error - target {cmds[1]} not found")
+                else:
+                    self.heal(cmds)
+            
+            if cmds[0] == "armor_recover":
+                if cmds[1] not in self.charKeys:
+                    print(f"Error - target {cmds[1]} not found")
+                else:
+                    self.armor_recover(cmds)
+            
+            if cmds[0] == "direct_armor_damage":
+                print(cmds[1])
+                if cmds[1] not in self.charKeys:
+                    print(f"Error - target {cmds[1]} not found")
+                else: 
+                    self.direct_armor_damage(cmds)
+
+            if cmds[0] == "range_table":
+                self.range_table(cmds)
+
+            if cmds[0] == "pass":
+                self.turn_pass()
+
+            if inp == 'wq' or inp == 'exit':
+                return self.save_and_exit(inp)
+
+            if inp == "q":
+                return True
+        except Exception as e:
+            print(e)
+            pass
         
-        if cmds[0] == "armor_recover":
-            if cmds[1] not in self.charKeys:
-                print("Error - target", cmds[0], " not found")
-            else:
-                self.armor_recover(cmds)
-        if cmds[0] == "range_table":
-            self.range_table(cmds)
-
-        if cmds[0] == "pass":
-            self.turn_pass()
-
-        if inp == 'x' or inp == 'q':
-            return self.do_exit(inp)
 
 if __name__ == '__main__':  
     cmdprompt().cmdloop()

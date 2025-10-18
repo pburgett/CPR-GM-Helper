@@ -43,11 +43,22 @@ The `attack` command is structured as follows: the target character, the subject
 
 For example, if Charlie was to attack Bravo, using a Pistol within 6 meters, the GM would run the following:
 ```
-> attack Bravo 17 13
+> attack Bravo 17 6m Pistol
+Ranged attack DV is - 13
 The attack hits! Roll the appropriate count of D6s and run
  damage  Bravo  <type [ranged/melee/autofire/direct] <damage>
 ```
-In this case, the last input is the DV for the melee attack as per page 173. Next, either the GM or respective player would roll *N* D6 for damage:
+
+This command automatically pulls the applicable difficulty value for a certain weapon type and range. For other attacks, including Melee and Brawling attacks, or Evasion attacks against ranged weapons, the attacker's roll would be directly compared against the defender's roll. For example, if Charlie was to attack Bravo using a melee weapon, the GM would run the following:
+
+```
+> attack Bravo 17 14
+The attack hits! Roll the appropriate count of D6s and run
+ damage  Bravo  <type [ranged/melee/autofire/direct] <damage>
+```
+
+
+Next, either the GM or respective player would roll *N* D6 for damage:
 ```
 damage Bravo ranged 14
 14 points of damage applied to  Bravo 
@@ -65,4 +76,27 @@ Now assuming that Charlie is done with their turn, they can run `pass` to move a
 ==================================
 It is  Bravo 's turn
 {'HP': 23, 'SP': 6, 'weapons': [{'Assault Rifle': '5d6'}, {'Heavy Pistol': '3d6'}, {'Big knucks': '3d6'}], 'challenge_score': None, 'attributes': {'I': 4, 'R': 7, 'D': 5, 'T': 4, 'C': 5, 'W': 2, 'M': 5, 'B': 4, 'E': 3}, 'melee_skills': {'B': 9, 'E': 7, 'MA': 0, 'M': 11}, 'ranged_skills': {'A': 10, 'Ha': 12, 'He': 3, 'S': 12}}
+```
+
+### Other Commands
+
+The `display` command can be run at any time after setting initiative for a quick look at who's turn it is, how much damage the players/NPCs have taken, and for a more detailed view of the current character.
+
+CPR-GM-Helper has a variety of other commands to assist DMs with creative damage execution and downtime recovery. 
+
+For an instance where damage is direct, and armor is not a factor (i.e fire, radiation), the GM can run:
+```
+damage <target> direct <value>
+```
+
+Armor can similarly be directly reduced. This event is not explicitly defined in the Corebook, but may occur if the Subject is using a particular method or weapon against the Target. The GM can run:
+```
+direct_armor_damage <target> <value>
+```
+
+For downtime recovery, the GM can use the `heal` and `armor_recover` commands respectively. Refer to pages 222-223 of the corebook for healing rules. The GM can run:
+
+```
+heal <target> <value>
+armor_recover <target> value
 ```
